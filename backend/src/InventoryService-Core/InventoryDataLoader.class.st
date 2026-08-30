@@ -65,7 +65,7 @@ InventoryDataLoader >> loadFromString: aJsonString [
 	self loadEquipment: (data at: 'equipment' ifAbsent: [ #(  ) ]).
 	self loadConnections: (data at: 'connections' ifAbsent: [ #(  ) ]).
 
-	Transcript showln: 'Inventory loaded: '
+	self log: 'Inventory loaded: '
 		, locationRepository count asString , ' locations, '
 		, equipmentRepository count asString , ' equipment, '
 		, connectionRepository count asString , ' connections'.
@@ -117,5 +117,20 @@ InventoryDataLoader >> loadConnections: aCollection [
 InventoryDataLoader >> warn: aMessage [
 
 	warnings add: aMessage.
-	Transcript showln: '[WARN] ' , aMessage
+	self log: '[WARN] ' , aMessage
+]
+
+{ #category : 'private' }
+InventoryDataLoader >> log: aMessage [
+	"All logging goes through here.
+
+	 Written as show:/cr rather than showln: — the latter is not part of
+	 StThreadSafeTranscript, which is what Transcript answers in Pharo 13.
+	 Routing every message through one method also means swapping in a real
+	 logging framework later is a one-method change."
+
+	Transcript
+		show: aMessage;
+		cr;
+		flush
 ]
