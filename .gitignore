@@ -1,9 +1,18 @@
+# Node
 node_modules/
 dist/
-build/
-coverage/
 *.log
-.env
-.env.local
+
+# Pharo
+*.image
+*.changes
+*.sources
+pharo-local/
+pharo
+pharo-ui
+pharo-vm/
+
+# Editors
+.vscode/
+.idea/
 .DS_Store
-.vite/
