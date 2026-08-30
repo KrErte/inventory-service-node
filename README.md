@@ -101,6 +101,30 @@ Vite serves on `http://localhost:5173` and proxies `/api` to `localhost:8080`, s
 the browser only ever sees one origin and there is no CORS configuration to keep
 in sync. In production nginx does the same thing (`frontend/nginx.conf`).
 
+## Deployment
+
+On a server with Docker installed:
+
+```bash
+git clone https://github.com/KrErte/inventory-service-node.git
+cd inventory-service-node
+echo "WEB_PORT=80" > .env
+docker compose -f docker-compose.yml -f docker-compose.prod.yml up -d --build
+```
+
+Updating later is `git pull` and the same `up -d --build`.
+
+Two things worth knowing before this faces the internet:
+
+- **There is no authentication.** Every endpoint is read-only over a static
+  sample dataset, so there is nothing to leak and nothing to modify — but the
+  API answers anyone who finds the host.
+- **HTTP only.** Let's Encrypt will not issue for a bare IP, so HTTPS needs a
+  domain name. With one, putting Caddy in front is the shortest path.
+
+The API container publishes its port on `127.0.0.1` only. Browsers reach it
+through nginx inside the compose network, so it never needs a public port.
+
 ## API
 
 | Endpoint | Answers |

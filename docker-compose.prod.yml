@@ -1,0 +1,14 @@
+# Production overlay. Deliberately thin: the only thing a server needs that a
+# laptop does not is for the containers to come back after a reboot or a crash.
+#
+# The public port is not set here — it comes from WEB_PORT in the server's .env
+# file, so the same compose file works whether the host puts the app on 80,
+# behind a reverse proxy, or somewhere else entirely.
+#
+#   docker compose -f docker-compose.yml -f docker-compose.prod.yml up -d --build
+services:
+  api:
+    restart: unless-stopped
+
+  web:
+    restart: unless-stopped

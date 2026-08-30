@@ -1,6 +1,10 @@
 # Host ports are overridable, because 3000 and 8080 are the two most contested
-# ports on any developer machine. Set them in a .env file next to this one, or
-# inline:  WEB_PORT=4000 docker compose up
+# ports on any developer machine:  WEB_PORT=4000 docker compose up
+#
+# The API is bound to 127.0.0.1 on purpose. Browsers never talk to it directly —
+# nginx proxies /api inside the compose network — so publishing it on all
+# interfaces would only widen the surface. Locally you can still curl it; on a
+# public server it stays unreachable from outside.
 services:
   api:
     build:
@@ -8,7 +12,7 @@ services:
     environment:
       INVENTORY_DATA_PATH: /opt/inventory/data/inventory.json
     ports:
-      - "${API_PORT:-8080}:8080"
+      - "127.0.0.1:${API_PORT:-8080}:8080"
 
   web:
     build:
