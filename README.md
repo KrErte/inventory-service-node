@@ -8,6 +8,12 @@ model, the traversal algorithm and the data-quality policy are unchanged; what
 changed is the runtime, and the notes below are mostly about what that cost and
 what it bought.
 
+**Live demo:** http://62.171.153.133:8090
+
+HTTP rather than HTTPS, and a port rather than a domain: the host already serves
+something else on 80, and Let's Encrypt will not issue a certificate for a bare
+IP address.
+
 ## Stack
 
 | Concern | Java version | Here |
@@ -108,9 +114,12 @@ On a server with Docker installed:
 ```bash
 git clone https://github.com/KrErte/inventory-service-node.git
 cd inventory-service-node
-echo "WEB_PORT=80" > .env
+echo "WEB_PORT=8090" > .env
 docker compose -f docker-compose.yml -f docker-compose.prod.yml up -d --build
 ```
+
+`WEB_PORT` is whatever the host has free — the demo above runs on 8090 because
+port 80 was already taken on that machine.
 
 Updating later is `git pull` and the same `up -d --build`.
 
