@@ -1,0 +1,25 @@
+{
+  "locations": [
+    { "id": "LOC-1", "name": "Tallinn", "latitude": 59.4370, "longitude": 24.7536 },
+    { "id": "LOC-2", "name": "Pärnu", "latitude": 58.3859, "longitude": 24.4971 }
+  ],
+
+  "equipment": [
+    { "id": "A", "name": "Equipment A", "type": "ROUTER", "locationId": "LOC-1", "status": "ACTIVE" },
+    { "id": "B", "name": "Equipment B", "type": "SWITCH", "locationId": "LOC-1", "status": "ACTIVE" },
+    { "id": "C", "name": "Equipment C", "type": "SWITCH", "locationId": "LOC-2", "status": "ACTIVE" },
+    { "id": "D", "name": "Equipment D", "type": "ROUTER", "locationId": "LOC-2", "status": "ACTIVE" },
+    { "id": "E", "name": "Equipment E", "type": "ACCESS_DEVICE", "locationId": "LOC-1", "status": "INACTIVE" },
+    { "id": "F", "name": "Equipment F", "type": "UNKNOWN", "locationId": "LOC-999", "status": "ACTIVE" }
+  ],
+
+  "connections": [
+    { "id": "CON-AB", "sourceEquipmentId": "A", "targetEquipmentId": "B", "status": "ACTIVE" },
+    { "id": "CON-BC", "sourceEquipmentId": "B", "targetEquipmentId": "C", "status": "ACTIVE" },
+    { "id": "CON-CD", "sourceEquipmentId": "C", "targetEquipmentId": "D", "status": "ACTIVE" },
+    { "id": "CON-BE", "sourceEquipmentId": "B", "targetEquipmentId": "E", "status": "ACTIVE" },
+    { "id": "CON-CE", "sourceEquipmentId": "C", "targetEquipmentId": "E", "status": "ACTIVE" },
+    { "id": "CON-AE", "sourceEquipmentId": "A", "targetEquipmentId": "E", "status": "INACTIVE" },
+    { "id": "CON-BROKEN", "sourceEquipmentId": "D", "targetEquipmentId": "DOES-NOT-EXIST", "status": "ACTIVE" }
+  ]
+}
