@@ -120,8 +120,13 @@ InventoryServer >> startWithData: aFileReference [
 InventoryServer >> startServerOnly [
 	"Routes only. Assumes buildGraph has already run."
 
+	"#defaultOutput applies to every route. The per-route `output:` modifier does
+	 not: it attaches to the most recently declared route, so writing it once at
+	 the end of a cascade silently JSON-encodes only the last one and leaves the
+	 rest answering printString."
 	teapot := Teapot configure: {
 			          #port -> port.
+			          #defaultOutput -> #json.
 			          #debugMode -> false }.
 
 	teapot
@@ -144,8 +149,6 @@ InventoryServer >> startServerOnly [
 
 		GET: '/api/v1/inventory/summary'
 		-> [ :request | inventoryService summary asDictionary ];
-
-		output: #json;
 
 		"One handler for the one error type — this is the whole
 		 @RestControllerAdvice."

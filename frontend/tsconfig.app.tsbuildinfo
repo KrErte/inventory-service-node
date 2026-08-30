@@ -1,0 +1,1 @@
+{"root":["./src/App.tsx","./src/api.ts","./src/main.tsx","./src/types.ts","./src/useTheme.ts","./src/components/DepthGraph.tsx","./src/components/EquipmentDetail.tsx","./src/components/LocationPanel.tsx","./src/components/StatusBadge.tsx","./src/components/SummaryTiles.tsx","./src/components/ThemeToggle.tsx"],"version":"5.9.3"}

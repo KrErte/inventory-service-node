@@ -1,0 +1,6 @@
+# Only the Tonel source and the dataset belong in the image.
+*.image
+*.changes
+*.sources
+pharo-local
+run-tests.ps1

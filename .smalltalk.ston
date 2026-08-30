@@ -1,0 +1,26 @@
+"
+smalltalkCI configuration.
+
+This is what the CI job reads: which baseline to load, from where, and which
+packages hold tests. smalltalkCI downloads a clean Pharo image, loads the
+project through Metacello, runs SUnit and reports results back to GitHub in
+JUnit XML.
+"
+SmalltalkCISpec {
+  #loading : [
+    SCIMetacelloLoadSpec {
+      #baseline : 'InventoryService',
+      #directory : 'backend/src',
+      #load : [ 'all' ],
+      #platforms : [ #pharo ]
+    }
+  ],
+  #testing : {
+    #include : {
+      #packages : [ 'InventoryService-Tests', 'InventoryService-Tests-Integration' ]
+    },
+    #coverage : {
+      #packages : [ 'InventoryService-Model', 'InventoryService-Core' ]
+    }
+  }
+}

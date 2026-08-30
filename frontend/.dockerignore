@@ -1,0 +1,6 @@
+# Without this, COPY . . drags the host's node_modules and dist into the build
+# context — slow, and it overwrites the clean install npm ci just did.
+node_modules
+dist
+.vite
+*.log

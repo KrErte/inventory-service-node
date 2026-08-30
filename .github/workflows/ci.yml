@@ -1,0 +1,56 @@
+name: CI
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+
+jobs:
+  backend:
+    name: Pharo tests
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      # smalltalkCI is the standard Smalltalk CI harness: it downloads a clean
+      # Pharo image, loads the project through the Baseline, runs SUnit and
+      # converts the results to JUnit XML so GitHub renders them natively.
+      - uses: hpi-swa/setup-smalltalkCI@v1
+        with:
+          smalltalk-image: Pharo64-13
+
+      - name: Run SUnit
+        run: smalltalkci -s Pharo64-13
+        shell: bash
+        timeout-minutes: 15
+
+  frontend:
+    name: React build
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: frontend
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+
+      - run: npm ci
+      - name: Typecheck
+        run: npm run typecheck
+      - run: npm run build
+
+  images:
+    name: Docker images
+    runs-on: ubuntu-latest
+    needs: [ backend, frontend ]
+    steps:
+      - uses: actions/checkout@v4
+      # Build only — no registry push configured yet. Proves both Dockerfiles
+      # still work before anything reaches a cluster.
+      - run: docker build -t inventory-api ./backend
+      - run: docker build -t inventory-web ./frontend

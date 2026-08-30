@@ -1,0 +1,541 @@
+/*
+ * Tokens first, components against tokens.
+ *
+ * Three theme states are handled, not two: an explicit data-theme stamp in
+ * either direction, plus the default unstamped state where only the OS setting
+ * separates light from dark. Every colour is defined on bare :root and only
+ * redefined inside the theme blocks — a colour whose sole definition lives in a
+ * media query renders one theme's ink on the other theme's ground.
+ *
+ * The blue depth ramp is an ordinal scale validated against both surfaces:
+ * single hue, monotone lightness, visible step gaps, and the step nearest the
+ * surface still clears 2:1.
+ */
+
+:root {
+  --plane: #f9f9f7;
+  --surface: #fcfcfb;
+  --surface-sunk: #f2f2ee;
+
+  --ink: #0b0b0b;
+  --ink-2: #52514e;
+  --muted: #898781;
+
+  --grid: #e1e0d9;
+  --baseline: #c3c2b7;
+  --border: rgba(11, 11, 11, 0.1);
+
+  --status-good: #0ca30c;
+  --status-critical: #d03b3b;
+
+  --depth-1: #86b6ef;
+  --depth-2: #5598e7;
+  --depth-3: #2a78d6;
+  --depth-4: #1c5cab;
+  --depth-5: #104281;
+
+  --root-node: #52514e;
+
+  --font: system-ui, -apple-system, 'Segoe UI', sans-serif;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme='light']) {
+    --plane: #0d0d0d;
+    --surface: #1a1a19;
+    --surface-sunk: #131312;
+
+    --ink: #ffffff;
+    --ink-2: #c3c2b7;
+    --muted: #898781;
+
+    --grid: #2c2c2a;
+    --baseline: #383835;
+    --border: rgba(255, 255, 255, 0.1);
+
+    --depth-1: #b7d3f6;
+    --depth-2: #86b6ef;
+    --depth-3: #5598e7;
+    --depth-4: #2a78d6;
+    --depth-5: #184f95;
+
+    --root-node: #c3c2b7;
+  }
+}
+
+:root[data-theme='dark'] {
+  --plane: #0d0d0d;
+  --surface: #1a1a19;
+  --surface-sunk: #131312;
+
+  --ink: #ffffff;
+  --ink-2: #c3c2b7;
+  --muted: #898781;
+
+  --grid: #2c2c2a;
+  --baseline: #383835;
+  --border: rgba(255, 255, 255, 0.1);
+
+  --depth-1: #b7d3f6;
+  --depth-2: #86b6ef;
+  --depth-3: #5598e7;
+  --depth-4: #2a78d6;
+  --depth-5: #184f95;
+
+  --root-node: #c3c2b7;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  background: var(--plane);
+  color: var(--ink);
+  font-family: var(--font);
+  font-size: 15px;
+  line-height: 1.55;
+  -webkit-font-smoothing: antialiased;
+}
+
+button {
+  font: inherit;
+  color: inherit;
+}
+
+:focus-visible {
+  outline: 2px solid var(--depth-3);
+  outline-offset: 2px;
+}
+
+/* ---------- shell ---------- */
+
+.app {
+  max-width: 1240px;
+  margin: 0 auto;
+  padding: 2rem 1.5rem 4rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.75rem;
+}
+
+.app-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.75rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid var(--baseline);
+}
+
+.app-head h1 {
+  margin: 0;
+  font-size: 1.4rem;
+  font-weight: 600;
+  letter-spacing: -0.015em;
+}
+
+.head-right {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.theme-toggle {
+  display: inline-flex;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.theme-toggle button {
+  background: var(--surface);
+  border: 0;
+  padding: 0.3rem 0.7rem;
+  font-size: 0.78rem;
+  color: var(--ink-2);
+  cursor: pointer;
+}
+
+.theme-toggle button + button {
+  border-left: 1px solid var(--border);
+}
+
+.theme-toggle button:hover {
+  background: var(--surface-sunk);
+}
+
+.theme-toggle button[aria-pressed='true'] {
+  background: var(--surface-sunk);
+  color: var(--ink);
+  font-weight: 600;
+}
+
+.app-head .sub {
+  margin: 0;
+  color: var(--muted);
+  font-size: 0.87rem;
+}
+
+.columns {
+  display: grid;
+  grid-template-columns: minmax(15rem, 20rem) minmax(0, 1fr);
+  gap: 1.5rem;
+  align-items: start;
+}
+
+@media (max-width: 60rem) {
+  .columns {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* ---------- panels ---------- */
+
+.panel {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 1.1rem 1.2rem 1.25rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.9rem;
+}
+
+.panel-title {
+  margin: 0;
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.stack {
+  display: flex;
+  flex-direction: column;
+  gap: 0.9rem;
+}
+
+/* ---------- stat tiles ---------- */
+
+.tiles {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(9rem, 1fr));
+  gap: 1px;
+  background: var(--border);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.tile {
+  background: var(--surface);
+  padding: 0.9rem 1rem 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+}
+
+.tile-label {
+  font-size: 0.75rem;
+  color: var(--muted);
+}
+
+.tile-value {
+  font-size: 1.9rem;
+  font-weight: 600;
+  line-height: 1.1;
+  letter-spacing: -0.02em;
+}
+
+/* Proportion bar: two segments with a 2px surface gap between fills. */
+.proportion {
+  display: flex;
+  gap: 2px;
+  height: 8px;
+  margin-top: 0.15rem;
+}
+
+.proportion span {
+  display: block;
+  border-radius: 2px;
+}
+
+.tile-wide {
+  grid-column: span 2;
+}
+
+@media (max-width: 44rem) {
+  .tile-wide {
+    grid-column: span 1;
+  }
+}
+
+.proportion-key {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  margin-top: 0.5rem;
+  font-size: 0.76rem;
+  color: var(--ink-2);
+}
+
+.proportion .active {
+  background: var(--status-good);
+}
+
+.proportion .inactive {
+  background: var(--baseline);
+}
+
+/* ---------- lists ---------- */
+
+.list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.list li + li {
+  border-top: 1px solid var(--grid);
+}
+
+.row {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.6rem;
+  padding: 0.55rem 0.5rem;
+  background: none;
+  border: 0;
+  border-radius: 3px;
+  text-align: left;
+  cursor: pointer;
+}
+
+.row:hover {
+  background: var(--surface-sunk);
+}
+
+.row[aria-current='true'] {
+  background: var(--surface-sunk);
+  box-shadow: inset 2px 0 0 var(--depth-3);
+}
+
+.row-main {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.row-name {
+  font-weight: 500;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.row-meta {
+  font-size: 0.78rem;
+  color: var(--muted);
+}
+
+/* ---------- status ---------- */
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  font-size: 0.72rem;
+  letter-spacing: 0.04em;
+  color: var(--ink-2);
+  white-space: nowrap;
+}
+
+.badge .dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  flex: none;
+}
+
+.badge.is-active .dot {
+  background: var(--status-good);
+}
+
+/* Inactive is a hollow ring, not a second colour: the shape carries the
+   distinction as well as the always-present text label. */
+.badge.is-inactive .dot {
+  background: transparent;
+  border: 1.5px solid var(--muted);
+}
+
+/* ---------- controls ---------- */
+
+.control {
+  display: flex;
+  align-items: center;
+  gap: 0.7rem;
+  flex-wrap: wrap;
+}
+
+.control label {
+  font-size: 0.8rem;
+  color: var(--ink-2);
+}
+
+.control input[type='range'] {
+  flex: 1;
+  min-width: 8rem;
+  accent-color: var(--depth-3);
+}
+
+.control output {
+  font-variant-numeric: tabular-nums;
+  font-weight: 600;
+  min-width: 1.5rem;
+  text-align: right;
+}
+
+/* ---------- graph ---------- */
+
+.graph-wrap {
+  overflow-x: auto;
+}
+
+.graph {
+  display: block;
+  width: 100%;
+  /* The rings are sized in the viewBox; letting the SVG scale past its natural
+     size on a wide screen just inflates the empty space between nodes. */
+  max-width: 640px;
+  height: auto;
+  min-width: 22rem;
+  margin: 0 auto;
+}
+
+.graph .ring {
+  fill: none;
+  stroke: var(--grid);
+  stroke-width: 1;
+}
+
+.graph .edge {
+  stroke: var(--baseline);
+  stroke-width: 2;
+  stroke-linecap: round;
+}
+
+.graph .node {
+  stroke: var(--surface);
+  stroke-width: 2;
+  cursor: pointer;
+}
+
+.graph .node.inactive {
+  stroke-dasharray: 3 2;
+  stroke: var(--muted);
+}
+
+.graph .node-label {
+  fill: var(--ink);
+  font-size: 11px;
+  font-weight: 600;
+  text-anchor: middle;
+  dominant-baseline: middle;
+  pointer-events: none;
+}
+
+.graph .ring-label {
+  fill: var(--muted);
+  font-size: 10px;
+  text-anchor: middle;
+  dominant-baseline: middle;
+  /* Halo of the chart surface, so the label survives whatever sits behind it. */
+  stroke: var(--surface);
+  stroke-width: 3px;
+  paint-order: stroke fill;
+}
+
+/* ---------- legend ---------- */
+
+.legend {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.75rem;
+  font-size: 0.78rem;
+  color: var(--ink-2);
+}
+
+.legend-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.legend-swatch {
+  width: 11px;
+  height: 11px;
+  border-radius: 2px;
+  flex: none;
+}
+
+/* ---------- table ---------- */
+
+.table-wrap {
+  overflow-x: auto;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.87rem;
+}
+
+th,
+td {
+  text-align: left;
+  padding: 0.45rem 0.7rem 0.45rem 0;
+  border-bottom: 1px solid var(--grid);
+  white-space: nowrap;
+}
+
+th {
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+td.num {
+  font-variant-numeric: tabular-nums;
+}
+
+/* ---------- states ---------- */
+
+.note {
+  margin: 0;
+  color: var(--muted);
+  font-size: 0.87rem;
+}
+
+.error {
+  margin: 0;
+  padding: 0.6rem 0.75rem;
+  border-left: 3px solid var(--status-critical);
+  background: var(--surface-sunk);
+  font-size: 0.87rem;
+  color: var(--ink-2);
+}
+
+.error strong {
+  color: var(--ink);
+}
